@@ -1,30 +1,32 @@
 version: 0.2
- 
+
 phases:
   install:
+    runtime-versions:
+      python: 3.8
     commands:
       - echo Installing dependencies...
       - pip install --upgrade pip
-pre_build:
-  commands:
-    - aws --version
-    - docker --version
-    - aws sts get-caller-identity
-    - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 605134465349.dkr.ecr.us-east-1.amazonaws.com
-
+      - pip install awscli --upgrade
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 605134465349.dkr.ecr.us-east-1.amazonaws.com
   build:
     commands:
       - echo Building the Docker image...
       - docker build -t sairajapp .
       - docker tag sairajapp:latest 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
+      - docker push 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
+      - echo Build completed on `date`
+      - printf '[{"name":"sairaj-container","imageUri":"%s"}]' 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest > imagedefinitions.json
   post_build:
     commands:
       - echo Pushing the Docker image...
       - docker push 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
       - echo Build completed on `date`
- 
+
 artifacts:
   files:
     - '**/*'
-
-
+    - 'imagedefinitions.json'
