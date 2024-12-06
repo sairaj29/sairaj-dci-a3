@@ -10,20 +10,20 @@ phases:
       - pip install awscli --upgrade
   pre_build:
     commands:
-      - echo Logging in to Amazon ECR...
-      - aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 605134465349.dkr.ecr.us-east-1.amazonaws.com
+      - echo Logging in to Amazon ECR Public...
+      - aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws
   build:
     commands:
       - echo Building the Docker image...
       - docker build -t sairajapp .
-      - docker tag sairajapp:latest 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
-      - docker push 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
+      - docker tag sairajapp:latest public.ecr.aws/i4a2a9c3/sairajapp:latest
+      - docker push public.ecr.aws/i4a2a9c3/sairajapp:latest
       - echo Build completed on `date`
-      - printf '[{"name":"sairaj-container","imageUri":"%s"}]' 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest > imagedefinitions.json
+      - printf '[{"name":"sairaj-container","imageUri":"%s"}]' public.ecr.aws/i4a2a9c3/sairajapp:latest > imagedefinitions.json
   post_build:
     commands:
       - echo Pushing the Docker image...
-      - docker push 605134465349.dkr.ecr.us-east-1.amazonaws.com/sairajapp:latest
+      - docker push public.ecr.aws/i4a2a9c3/sairajapp:latest
       - echo Build completed on `date`
 
 artifacts:
